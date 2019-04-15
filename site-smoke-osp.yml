@@ -9,6 +9,9 @@
     tags:
       - osp.smoke
 
+  - debug:
+      var: openstack_info
+
   - name: Curl website
     uri:
       url: "http://{{ openstack_info.ansible_facts.openstack_servers[0].accessIPv4 }}"
@@ -17,7 +20,8 @@
     tags:
       - osp.smoke
 
-  - debug: msg="{{ webpage }}"
+  - debug:
+      var: webpage
 
   - name: Fail if 'Ansible has done its job' is not in the page content
     fail:
