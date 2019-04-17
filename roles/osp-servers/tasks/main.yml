@@ -1,16 +1,15 @@
 ---
+# tasks file for osp.servers
 - name: Create new server instances and attaches them a network and passes metadata to the instance
-  os_servers:
+  os_server:
     cloud: ospcloud
-    name: "{{item.name}}"
-    state: "{{item.state}}"
-    image: "{{item.image}}"
-    meta:
-      group: "{{item.meta[0].group}}"
-      deployment_name: "{{item.meta[0].deployment_name}}"
-    flavor: "{{item.flavor}}"
-    security_groups: "{{item.security_group}}"
-    key_name: "{{item.key_name}}"
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    image: "{{ item.image }}"
+    meta: "group={{item.meta[0].group}},deployment_name={{item.meta[0].deployment_name}}"
+    flavor: "{{ item.flavor }}"
+    security_groups: "{{ item.security_group }}"
+    key_name: "{{ item.key_name }}"
     wait: yes
     nics:
       - net-name: int_network
@@ -21,32 +20,32 @@
       curl -o /tmp/internal.repo http://www.opentlc.com/download/ansible_bootcamp/repo/internal.repo
       cp /tmp/internal.repo /etc/yum.repos.d/internal.repo
   loop:
-    - "{{osp_servers.frontend}}"
-    - "{{osp_servers.app1}}"
-    - "{{osp_servers.app2}}"
-    - "{{osp_servers.db}}"
+    - "{{ osp_servers.frontend }}"
+    - "{{ osp_servers.app1 }}"
+    - "{{ osp_servers.app2 }}"
+    - "{{ osp_servers.db }}"
 
-- name: Add floating IP to Servers
+- name: Add floating IP to server instances
   os_floating_ip:
-    cloud: opscloud
+    cloud: ospcloud
     state: present
     reuse: yes
-    server: "{{item.name}}"
+    server: "{{ item.name }}"
     network: ext_network
     wait: yes
-    timeout: 100
+    timeout: 180
   loop:
     - "{{ osp_servers.frontend }}"
     - "{{ osp_servers.app1 }}"
     - "{{ osp_servers.app2 }}"
     - "{{ osp_servers.db }}"
-  register: instancefloatingip   
+  register: instancefloatingip
 
-- name: Print Instance Float IP
+- name: Print Float IP
   debug:
     var: instancefloatingip
 
-- name: Wait for server to be available
+- name: Wait for server instances to be available
   wait_for:
     host: "{{ item.floating_ip.floating_ip_address }}"
     port: 22
