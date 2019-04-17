@@ -1,6 +1,5 @@
 ---
-# Initial, common, system setup steps
-
+# tasks file for base-config
 - name: enable sudo without tty for some ansible commands
   replace:
     path: /etc/sudoers
@@ -20,7 +19,8 @@
  
 - name: install base tools and packages
   yum:
-    name:
-      - httpie
-      - python-pip
+    name: "{{ item }}" 
     state: latest
+  with_items:
+    - httpie
+    - python-pip
